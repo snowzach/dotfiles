@@ -1,0 +1,123 @@
+color_default='\e[39m'
+color_black='\e[30m'
+color_red='\e[31m'
+color_green='\e[32m'
+color_yellow='\e[33m'
+color_blue='\e[34m'
+color_magenta='\e[35m'
+color_cyan='\e[36m'
+color_ltgray='\e[37m'
+color_dkgray='\e[90m'
+color_ltred='\e[91m'
+color_ltgreen='\e[92m'
+color_ltyellow='\e[93m'
+color_ltblue='\e[94m'
+color_ltmagenta='\e[95m'
+color_ltcyan='\e[96m'
+color_white='\e[97m'
+bgcolor_default='\e[49m'
+bgcolor_black='\e[40m'
+bgcolor_red='\e[41m'
+bgcolor_green='\e[42m'
+bgcolor_yellow='\e[43m'
+bgcolor_blue='\e[44m'
+bgcolor_magenta='\e[45m'
+bgcolor_cyan='\e[46m'
+bgcolor_ltgray='\e[47m'
+bgcolor_dkgray='\e[100m'
+bgcolor_ltred='\e[101m'
+bgcolor_ltgreen='\e[102m'
+bgcolor_ltyellow='\e[103m'
+bgcolor_ltblue='\e[104m'
+bgcolor_ltmagenta='\e[105m'
+bgcolor_ltcyan='\e[106m'
+bgcolor_white='\e[107m'
+
+color_invert='\e[7m'
+color_normal='\e[27m'
+
+# get current branch in git repo
+function parse_git_branch() {
+    BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+    if [ ! "${BRANCH}" == "" ]
+    then
+        echo -e "${BRANCH}"
+    else
+        echo ""
+    fi
+}
+
+# get current status of git repo
+function parse_git_dirty {
+    status=`git status 2>&1 | tee`
+    dirty=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
+    untracked=`echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
+    ahead=`echo -n "${status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?"`
+    newfile=`echo -n "${status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?"`
+    renamed=`echo -n "${status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?"`
+    deleted=`echo -n "${status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?"`
+    bits=''
+    if [ "${renamed}" == "0" ]; then
+        bits=">${bits}"
+    fi
+    if [ "${ahead}" == "0" ]; then
+        bits="*${bits}"
+    fi
+    if [ "${newfile}" == "0" ]; then
+        bits="+${bits}"
+    fi
+    if [ "${untracked}" == "0" ]; then
+        bits="?${bits}"
+    fi
+    if [ "${deleted}" == "0" ]; then
+        bits="x${bits}"
+    fi
+    if [ "${dirty}" == "0" ]; then
+        bits="!${bits}"
+    fi
+    if [ ! "${bits}" == "" ]; then
+        echo "${bits}"
+    else
+        echo ""
+    fi
+}
+
+function bash_prompt {
+    # If the last command failed, make it obvious
+    PS1="\[${bgcolor_black}\]`if [ ! $? = 0 ]; then echo "\[${color_red}\] ✘"; fi` \[${color_white}\]"
+    # user@host dir
+    PS1+="\u@\h"
+    # k8s info
+    if [ -f ~/.kube/config ]; then
+        CONTEXT=$(cat ~/.kube/config | grep "current-context:" | sed "s/current-context: //")
+    fi
+    if [ -n "$CONTEXT" ] && [ -z "$PROMPT_NO_KUBE" ]; then
+        PS1+="\[${bgcolor_magenta}\]\[${color_black}\]\[${color_green}\]"
+        PS1+="⎈:${CONTEXT}"
+        PS1+="\[${bgcolor_blue}\]\[${color_magenta}\]\[${color_black}\]"
+    else
+        PS1+="\[${bgcolor_blue}\]\[${color_black}\]"
+    fi
+    # path
+    PS1+="\w\[${color_blue}\]"
+    # git info
+    gitbranch=$(parse_git_branch)
+    if [ ! -z "$gitbranch" ]; then
+        gitdirty=$(parse_git_dirty)
+        if [ ! -z "$gitdirty" ]; then
+            PS1+="\[${bgcolor_yellow}\]\[${color_blue}\]"
+        else
+            PS1+="\[${bgcolor_green}\]\[${color_blue}\]"
+        fi
+        PS1+="\[${color_black}\]${gitbranch}{$gitdirty}"
+        if [ ! -z "$gitdirty" ]; then
+            PS1+="\[${color_yellow}\]"
+        else
+            PS1+="\[${color_green}\]"
+        fi
+    fi
+    # restore colors
+    PS1+="\[${bgcolor_default}\]\[${color_default}\] "
+}
+
+PROMPT_COMMAND="bash_prompt"

@@ -1,0 +1,8 @@
+ThemeFile=argonaut
+CursorType=block
+CursorBlinks=no
+Font=Source Code Pro
+FontHeight=10
+RightClickAction=paste
+ScrollbackLines=100000
+MiddleClickAction=void
