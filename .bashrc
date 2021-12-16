@@ -21,6 +21,11 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias ts2date="printf '%(%c)T\n'; TZ=UTC printf '%(%c)T\n'"
 
+# If running Cygwin under Alacritty you need to use script to create a pseudo-tty to run under
+if [[ -e "/cygdrive" && -n "$ALACRITTY_LOG" ]]; then
+    alias tmux='function _tmux(){ script -q -c "tmux -u $@" /dev/null; }; _tmux'
+fi
+
 umask 022
 echo -ne "\e]0;${USER}@${HOSTNAME}\a"
 
