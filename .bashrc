@@ -19,7 +19,10 @@ alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias ts2date="printf '%(%c)T\n'; TZ=UTC printf '%(%c)T\n'"
+function ts2date {
+    printf '%(%c)T\n' $1
+    TZ=UTC printf '%(%c)T\n' $1
+}
 
 # If running Cygwin under Alacritty you need to use script to create a pseudo-tty to run under
 if [[ -e "/cygdrive" && -n "$ALACRITTY_LOG" ]]; then

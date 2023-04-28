@@ -1,8 +1,5 @@
-set tabsize 4
+set tabsize 2
 set tabstospaces
-set smooth
-#set autoindent
-set morespace
 set cutfromcursor
 
 bind ^Space mark main
