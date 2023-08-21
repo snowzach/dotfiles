@@ -31,6 +31,7 @@ config.window_padding = {
   top = 2,
   bottom = 2,
 }
+config.selection_word_boundary = ',│`|:\" ()[]{}<>\t' .. "'"
 
 config.mouse_bindings = {
   -- Change the default click behavior so that it only selects
