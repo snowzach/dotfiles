@@ -16,6 +16,7 @@ ln -s $1/.bash_prompt ~/.bash_prompt
 ln -s $1/.tmux.conf ~/.tmux.conf
 ln -s $1/.tmuxline.conf ~/.tmuxline.conf
 ln -s $1/.nanorc ~/.nanorc
+ln -s $1/.wezterm.lua ~/.wezterm.lua
 
 if [ ! -z "${WINDIR}" ]; then
     echo "Installing mintty files for cygwin..."
